@@ -2,8 +2,17 @@ import {StyleSheet, Text, View, Button, TextInput, SafeAreaView} from 'react-nat
 import React, { useState } from 'react';
 
 const { Magic } = require('@magic-sdk/react-native');
+const { SolanaExtension } = require('@magic-ext/solana');
 
-const m = new Magic('pk_live_4A07772AF4011BB6');
+//const m = new Magic('pk_live_4A07772AF4011BB6');
+
+const m = new Magic('pk_live_4A07772AF4011BB6', {
+    extensions: [
+        new SolanaExtension({
+            rpcUrl: 'SOLANA_RPC_NODE_URL',
+        }),
+        ],
+});
 
 const styles = StyleSheet.create({
     appContainer: {
@@ -46,6 +55,10 @@ export default function App() {
         console.log(meta);
     };
 
+    const airdrop = async () => {
+        console.log("test")
+    }
+
     return (
             <SafeAreaView style={styles.appContainer}>
                 {/* Remember to render the `Relayer` component into your app! */}
@@ -54,6 +67,7 @@ export default function App() {
                 <Button style={styles.button} onPress={onClick} title="Submit" />
                 <Button onPress={logout} title="Logout" />
                 <Button onPress={getMeta} title="Get Data" />
+                <Button onPress={airdrop} title="Get Sol" />
             </SafeAreaView>
             );
 }
