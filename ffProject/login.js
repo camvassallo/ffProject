@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { magic, web3, connection } from './magic.js';
 
-const LoginScreen = props => {
-	console.log(props.route.name)
+var wallet, loginStatus
+export { wallet }
+
+const LoginScreen = () => {
+//	console.log(props.route.name)
 
     // Create Local User Variables
 	const [phoneNumber, setPhoneNumber] = useState('')
@@ -15,6 +18,7 @@ const LoginScreen = props => {
 	useEffect(() => {
 		magic.user.isLoggedIn().then(async (magicIsLoggedIn) => {
 			setIsLoggedIn(magicIsLoggedIn);
+			loginStatus = magicIsLoggedIn;
 			if (magicIsLoggedIn) {
 				magic.user.getMetadata().then((user) => {
 					setUserMetadata(user);
@@ -27,8 +31,9 @@ const LoginScreen = props => {
 		}, [isLoggedIn]);
 
 	const login = async () => {
-		await magic.auth.loginWithSMS({ phoneNumber: phoneNumber })
+		await magic.auth.loginWithEmailOTP({ email: "cam.vassallo12@gmail.com" })
 		setIsLoggedIn(true);
+		loginStatus = true;
 	};
 
 	const getBalance = async (pubKey) => {
@@ -38,6 +43,7 @@ const LoginScreen = props => {
 	const logout = async () => {
 		await magic.user.logout();
 		setIsLoggedIn(false);
+		loginStatus = false;
 		setUserMetadata(magic.user)
 	};
 
@@ -45,7 +51,6 @@ const LoginScreen = props => {
 	return (
 		<View style={styles.container}>
 			<magic.Relayer />
-			<Text>{props.route.name}</Text>
 			<TextInput
 				style={styles.input}
 				value={phoneNumber}

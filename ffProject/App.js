@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View, Button, TextInput, SafeAreaView} from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as web3 from '@solana/web3.js';
 
 import 'react-native-get-random-values';
@@ -14,16 +14,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import LoginScreen from './login.js';
-//import { magic } from './magic.js';
+import { wallet } from './login.js';
 
-var magic = new Magic('pk_live_4A07772AF4011BB6', {
-	extensions: [
-		new SolanaExtension({
-			rpcUrl
-		}),
-		],
-});
-export {magic};
+import { magic } from './magic.js';
 
 var m = magic;
 
@@ -60,6 +53,22 @@ export default function App() {
     const [sendAmount, setSendAmount] = useState(0);
     const [sendingTransaction, setSendingTransaction] = useState(false);
     const [txHash, setTxHash] = useState("");
+
+	useEffect(() => {
+		magic.user.isLoggedIn().then(async (magicIsLoggedIn) => {
+			setIsLoggedIn(magicIsLoggedIn);
+			loginStatus = magicIsLoggedIn;
+			if (magicIsLoggedIn) {
+				magic.user.getMetadata().then((user) => {
+					setUserMetadata(user);
+					const pubKey = new web3.PublicKey(user.publicAddress);
+					getBalance(pubKey);
+					console.log(user.publicAddress)
+				});
+			}
+		});
+		}, [isLoggedIn]);
+
 
     const onClick = async () => {
         console.log(phoneNumber);
@@ -226,13 +235,23 @@ export default function App() {
 //            </NavigationContainer>
 //            );
 
+	// Conditional Rendering
+	const LoginFilter = () => {
+		if (isLoggedIn) {
+			console.log("here")
+			return <ProfileScreen />
+//			return <Stack.Screen name={"Profile"} component={ProfileScreen}/>
+		}
+		console.log("there")
+		return <LoginScreen />
+	}
+
+
     // App return with imported view from other js files
     return (
-            <NavigationContainer>
-                <Stack.Navigator>
-					<Stack.Screen name={"Home"} component={LoginScreen}/>
-                </Stack.Navigator>
-            </NavigationContainer>
+			<SafeAreaView style={styles.appContainer}>
+				<LoginFilter />
+			</SafeAreaView>
             );
 
 }
